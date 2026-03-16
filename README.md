@@ -3,5 +3,5 @@ Official implementation of GeoFlow, a lightweight and efficient framework for fi
 **Accepted at CVPR 2026**
 
 <p align="center">
-  <img src="assets/geoflow_architecture.png" width="900">
+  <img src="assets/geoflow_architecture.pdf" width="900">
 </p>
