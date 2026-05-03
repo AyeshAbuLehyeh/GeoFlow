@@ -1,54 +1,132 @@
-# GeoFlow (Real-Time Fine-Grained Cross-View Geolocalization via Iterative Flow Prediction)
-Official implementation of GeoFlow, a lightweight and efficient framework for fine-grained cross-view geolocalization
-**Accepted at CVPR 2026**
+# GeoFlow
+
+Official implementation of **GeoFlow: Real-Time Fine-Grained Cross-View Geolocalization via Iterative Flow Prediction**.
+
+[Project page](https://ayeshabulehyeh.github.io/geoflow_page/) · CVPR 2026
 
 <p align="center">
-  <img src="assets/geoflow_architecture.png" width="900">
+  <img src="assets/geoflow_architecture.png" width="900" alt="GeoFlow architecture">
 </p>
 
 ---
 
 ## Overview
 
-Fine-grained cross-view geolocalization aims to determine the precise geographic location of a **ground-level image** by matching it with satellite imagery. Existing approaches often rely on computationally heavy matching or dense correlation mechanisms, resulting in high memory usage and slow inference.
+GeoFlow is a lightweight framework for fine-grained cross-view geolocalization. The method formulates localization as an iterative flow refinement problem: the model extracts shared visual context once and then refines a coordinate estimate through lightweight updates.
 
-**GeoFlow** introduces a lightweight and efficient alternative by formulating localization as an **iterative coordinate refinement problem**. Instead of predicting the final location in a single step, GeoFlow progressively improves a coordinate estimate through **iterative flow prediction**.
-
-The model first extracts shared visual context between the ground and aerial views and then repeatedly refines candidate coordinates using lightweight regression modules. Since the expensive visual feature extraction is performed only once, the refinement iterations incur minimal additional computational cost.
-
-This design enables GeoFlow to achieve a strong balance between **accuracy, computational efficiency, and real-time inference speed**, making it suitable for **resource-constrained deployment scenarios such as robotics, UAV navigation, and embedded vision systems**.
+The current public release focuses on the **KITTI** codebase. The **VIGOR** release will follow in a subsequent update.
 
 ---
 
-## Paper
+## Released code
 
-**GeoFlow: Real-Time Fine-Grained Cross-View Geolocalization via Iterative Flow Prediction**  
-Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (**CVPR 2026**)
-
-Paper and project page links will be added soon.
+This repo includes implementations for the KITTI and VIGOR components of GeoFlow. Each component lives in its own directory (`kitti/`, `vigor/`) and contains the code needed to train and evaluate the corresponding models. Legacy compatibility wrappers are provided where useful to avoid breaking older scripts.
 
 ---
 
-## Code
+## Installation
 
-The full training and evaluation code will be released soon.
+Install the Python dependencies using the provided `requirements.txt`:
 
-The repository will include:
+```bash
+pip install -r requirements.txt
+```
+If you prefer a named environment, activate it first (example for conda):
 
-- Training pipeline
-- Evaluation scripts
-- Pretrained models
-- Dataset loaders for cross-view geolocalization benchmarks
+```bash
+conda create -n myenv python=3.10
+conda activate myenv
+pip install -r requirements.txt
+```
+
+---
+
+## KITTI data preparation
+
+The KITTI loaders expect the dataset to follow the existing GeoFlow directory layout and file lists used in the original project.
+
+Expected list files:
+
+- `train_files.txt`
+- `test1_files.txt`
+- `test2_files.txt`
+
+Each entry should match the dataset indexing format used by the current loaders.
+
+The dataset root is configured in [kitti/data.py](kitti/data.py).
 
 ---
 
-## Datasets
+## Training
 
-GeoFlow is evaluated on standard cross-view geolocalization benchmarks:
+### 1) Non-orientation model
 
-- **KITTI**
-- **VIGOR**
+Train the localization model with orientation provided by the pipeline:
 
-Instructions for dataset preparation will be provided soon.
+```bash
+python -m kitti.train \
+  --train-list ./train_files.txt \
+  --batch-size 128 \
+  --epochs 200 \
+  --backbone efficientnet_b0 \
+  --d-model 128 \
+  --use-augmentation
+```
+
+### 2) Orientation-aware model
+
+Train the variant that predicts orientation jointly with localization:
+
+```bash
+python -m kitti.train_cross_orient \
+  --train-list ./train_files.txt \
+  --batch-size 128 \
+  --epochs 200 \
+  --backbone efficientnet_b0 \
+  --d-model 128
+```
+
+### Checkpoints and logs
+
+Each run writes to a timestamped directory under `checkpoints/` and stores:
+
+- `best.pth` — best checkpoint by training loss
+- `last.pth` — most recent checkpoint
+- `epoch_###.pth` — periodic snapshots
+- `config.json` — run configuration
+- `train_log.txt` — human-readable training log
 
 ---
+
+## Evaluation
+
+Run the non-orientation evaluation:
+
+```bash
+python -m kitti.eval --model-path checkpoints/<run_name>/best.pth --test-set test2
+```
+
+Run the orientation-aware evaluation:
+
+```bash
+python -m kitti.testing_iterate_orient --checkpoint-path checkpoints/<run_name>/best.pth
+```
+
+Evaluation outputs are written to `inference_outputs/` as both text and JSON summaries.
+
+---
+
+## Planned release
+
+The next public update will include:
+
+- VIGOR code release
+- Additional evaluation scripts and benchmark notes
+- Pretrained checkpoints, when available
+
+---
+
+## Citation
+
+If GeoFlow is useful for your research, please cite the paper once the final BibTeX entry is released on the project page.
+

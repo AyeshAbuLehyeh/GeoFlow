@@ -1,0 +1,1 @@
+"""VIGOR release package placeholder."""
