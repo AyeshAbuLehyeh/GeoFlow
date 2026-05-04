@@ -17,7 +17,7 @@ The current public release focuses on the **KITTI** codebase. The **VIGOR** rele
 ### 1) Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/AyeshAbuLehyeh/GeoFlow.git
 cd GeoFlow
 ```
 
@@ -81,7 +81,7 @@ python -m kitti.train \
 
 ### 2) Orientation-aware model
 
-Jointly predicts both translation and camera orientation, so it can localize without assuming orientation is known beforehand. ((Unknown orientation)) 
+Jointly predicts both translation and camera orientation, so it can localize without assuming orientation is known beforehand. (Unknown orientation) 
 
 ```bash
 python -m kitti.train_orient \
