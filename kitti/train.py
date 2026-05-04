@@ -107,7 +107,7 @@ def main():
                 save_checkpoint(periodic_path, model, optimizer=optimizer, scheduler=scheduler, epoch=epoch_idx + 1, best_metric=best_train_loss, args=args)
                 print(f"-> Saved periodic checkpoint: {periodic_path}")
 
-    print(f"Training complete. Outputs saved to {run_dir}.")
+    print(f"Training complete.. Outputs saved to {run_dir}.")
 
 
 if __name__ == "__main__":
