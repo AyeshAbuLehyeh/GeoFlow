@@ -19,7 +19,7 @@ except ImportError:  # pragma: no cover - standalone execution fallback
     import utils
 
 
-ROOT_DIR = "/gpfs2/scratch/aabulehy/Datasets/KITTI"
+ROOT_DIR = "/gpfs2/scratch/Datasets/KITTI"
 
 SATMAP_DIR = "satmap"
 GRDIMAGE_DIR = "raw_data"
@@ -310,7 +310,7 @@ def load_val_data(batch_size: int, file_path: str, root: str = ROOT_DIR, num_wor
     )
 
 
-def load_test1_data(batch_size: int, shift_range_lat: float = 20, shift_range_lon: float = 20, rotation_range: float = 10, root: str = ROOT_DIR, num_workers: int = NUM_WORKERS):
+def load_test1_data(batch_size: int, shift_range_lat: float = 20, shift_range_lon: float = 20, rotation_range: float = 10, root: str = ROOT_DIR, file_path: str = TEST1_FILE, num_workers: int = NUM_WORKERS):
     satmap_process_sidelength = utils.get_process_satmap_sidelength()
     satmap_transform = _build_transform((satmap_process_sidelength, satmap_process_sidelength), augment=False)
     grdimage_transform = _build_transform((GRD_IMG_H, GRD_IMG_W), augment=False)
@@ -320,7 +320,7 @@ def load_test1_data(batch_size: int, shift_range_lat: float = 20, shift_range_lo
 
     test1_set = SatGrdDatasetTest(
         root=root,
-        file=TEST1_FILE,
+        file=file_path,
         transform=(satmap_transform, grdimage_transform),
         shift_range_lat=shift_range_lat,
         shift_range_lon=shift_range_lon,
@@ -328,8 +328,7 @@ def load_test1_data(batch_size: int, shift_range_lat: float = 20, shift_range_lo
     )
     return DataLoader(test1_set, batch_size=batch_size, shuffle=False, pin_memory=True, num_workers=num_workers, drop_last=False)
 
-
-def load_test2_data(batch_size: int, shift_range_lat: float = 20, shift_range_lon: float = 20, rotation_range: float = 10, root: str = ROOT_DIR, num_workers: int = NUM_WORKERS):
+def load_test2_data(batch_size: int, shift_range_lat: float = 20, shift_range_lon: float = 20, rotation_range: float = 10, root: str = ROOT_DIR, file_path: str = TEST2_FILE, num_workers: int = NUM_WORKERS):
     satmap_process_sidelength = utils.get_process_satmap_sidelength()
     satmap_transform = _build_transform((satmap_process_sidelength, satmap_process_sidelength), augment=False)
     grdimage_transform = _build_transform((GRD_IMG_H, GRD_IMG_W), augment=False)
@@ -339,7 +338,7 @@ def load_test2_data(batch_size: int, shift_range_lat: float = 20, shift_range_lo
 
     test2_set = SatGrdDatasetTest(
         root=root,
-        file=TEST2_FILE,
+        file=file_path,
         transform=(satmap_transform, grdimage_transform),
         shift_range_lat=shift_range_lat,
         shift_range_lon=shift_range_lon,

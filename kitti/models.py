@@ -1,4 +1,4 @@
-"""Model definitions for GeoFlow on KITTI."""
+"""Model definitions for GeoFlow."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ except ImportError:  # pragma: no cover - standalone execution fallback
 
 
 class GeoFlowKITTI(nn.Module):
-    """GeoFlow model for KITTI cross-view localization.
+    """GeoFlow model.
 
     Parameters
     ----------

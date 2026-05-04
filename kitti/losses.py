@@ -1,4 +1,4 @@
-"""Loss functions for KITTI training and evaluation."""
+"""Loss functions for training and evaluation."""
 
 from __future__ import annotations
 

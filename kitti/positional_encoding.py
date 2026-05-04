@@ -1,4 +1,4 @@
-"""Positional encodings used by the KITTI GeoFlow models."""
+"""Positional encodings used by the GeoFlow models."""
 
 from __future__ import annotations
 

@@ -27,6 +27,8 @@ def parse_args():
     parser.add_argument("--backbone", default="efficientnet_b0", type=str)
     parser.add_argument("--d-model", default=128, type=int)
     parser.add_argument("--sat-size", default=512, type=int)
+    parser.add_argument("--root-dir", default="/gpfs2/scratch/Datasets/KITTI", type=str)
+    parser.add_argument("--test-file", default="/gpfs2/scratch/kitti/test2_files.txt", type=str)
     parser.add_argument("--output-dir", default="inference_outputs", type=str)
     return parser.parse_args()
 
@@ -46,9 +48,9 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if args.test_set == "test1":
-        loader = load_test1_data(batch_size=args.batch_size)
+        loader = load_test1_data(batch_size=args.batch_size, root=args.root_dir, file_path=args.test_file)
     else:
-        loader = load_test2_data(batch_size=args.batch_size)
+        loader = load_test2_data(batch_size=args.batch_size, root=args.root_dir, file_path=args.test_file)
 
     model = GeoFlowKITTI(d_model=args.d_model, backbone=args.backbone, sat_size=args.sat_size).to(device)
     load_checkpoint(args.model_path, model, device=device)

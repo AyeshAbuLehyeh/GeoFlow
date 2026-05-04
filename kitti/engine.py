@@ -1,4 +1,4 @@
-"""Reusable training and evaluation helpers for KITTI GeoFlow experiments."""
+"""Reusable training and evaluation helpers for GeoFlow experiments."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 import numpy as np
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 
 try:
     from .losses import AngularDirectionLoss, OrientationLoss
@@ -89,7 +90,11 @@ def save_checkpoint(path: str, model: torch.nn.Module, optimizer: Optional[torch
 def load_checkpoint(path: str, model: torch.nn.Module, optimizer: Optional[torch.optim.Optimizer] = None, scheduler: Optional[Any] = None, device: str | torch.device = "cpu"):
     checkpoint = torch.load(path, map_location=device)
     state_dict = checkpoint["model"] if isinstance(checkpoint, dict) and "model" in checkpoint else checkpoint
-    unwrap_model(model).load_state_dict(state_dict, strict=True)
+    missing_keys, unexpected_keys = unwrap_model(model).load_state_dict(state_dict, strict=False)
+    if missing_keys:
+        print(f"Warning: missing keys while loading checkpoint: {missing_keys}")
+    if unexpected_keys:
+        print(f"Warning: unexpected keys while loading checkpoint: {unexpected_keys}")
     if optimizer is not None and isinstance(checkpoint, dict) and "optimizer" in checkpoint:
         optimizer.load_state_dict(checkpoint["optimizer"])
     if scheduler is not None and isinstance(checkpoint, dict) and "scheduler" in checkpoint:
@@ -159,7 +164,7 @@ def train_one_epoch(model: torch.nn.Module, dataloader, optimizer, device, lambd
 
 
 @torch.inference_mode()
-def evaluate_localization(model: torch.nn.Module, loader, device: str, num_iterations: int = 5, num_random_starts: int = 10, step_fraction: float = 0.5):
+def evaluate_localization(model: torch.nn.Module, loader, device: str, num_iterations: int = 5, num_random_starts: int = 10):
     model.eval()
 
     dataset = loader.dataset
@@ -174,7 +179,7 @@ def evaluate_localization(model: torch.nn.Module, loader, device: str, num_itera
 
     center_x, center_y = 512 / 2, 512 / 2
 
-    for batch in loader:
+    for batch in tqdm(loader, total=len(loader), desc="Evaluating", unit="batch"):
         sat_map, camera_k, grd_img, x_shift, y_shift, theta, file_name = batch
         sat_img = sat_map.to(device, non_blocking=True)
         grd_img = grd_img.to(device, non_blocking=True)
@@ -188,7 +193,7 @@ def evaluate_localization(model: torch.nn.Module, loader, device: str, num_itera
             pred_mu_r, _, pred_mu_vec, _ = unwrap_model(model)(sat_batch, grd_batch, coord=current_coords)
             pred_direction = F.normalize(pred_mu_vec, p=2, dim=1)
             pred_distance = torch.exp(pred_mu_r)
-            current_coords = current_coords + pred_direction * pred_distance * step_fraction
+            current_coords = current_coords + pred_direction * pred_distance * 0.5
 
         final_candidates = current_coords.view(sat_img.shape[0], num_random_starts, 2)
         final_prediction_norm = torch.mean(final_candidates, dim=1)
