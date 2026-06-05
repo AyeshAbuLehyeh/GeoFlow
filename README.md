@@ -127,11 +127,13 @@ Evaluation outputs are written to `inference_outputs/` as both text and JSON sum
 If GeoFlow is useful for your research, please cite:
 
 ```bibtex
-@article{abulehyeh2026geoflow,
-      title  = {{GeoFlow}: Real-Time Fine-Grained Cross-View Geolocalization via Iterative Flow Prediction},
-      author = {Abu Lehyeh, Ayesh and Zhang, Xiaohan and Arrabi, Ahmad and Sultani, Waqas and Chen, Chen and Wshah, Safwan},
-      journal={arXiv preprint arXiv:2603.21943},
-      year={2026}
+@InProceedings{Abu_Lehyeh_2026_CVPR,
+    author    = {Abu Lehyeh, Ayesh and Zhang, Xiaohan and Arrabi, Ahmad and Sultani, Waqas and Chen, Chen and Wshah, Safwan},
+    title     = {GeoFlow: Real-Time Fine-Grained Cross-View Geolocalization via Iterative Flow Prediction},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2026},
+    pages     = {5369-5378}
 }
 ```
 
